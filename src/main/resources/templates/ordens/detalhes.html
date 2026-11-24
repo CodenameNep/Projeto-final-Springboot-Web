@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detalhes da OS - TechFix OS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-dark"><div class="container"><a class="navbar-brand" th:href="@{/}">TechFix OS</a><a class="btn btn-outline-light btn-sm" th:href="@{/ordens}">Voltar às ordens</a></div></nav>
+<main class="container py-4" id="os-main">
+    <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+    <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2"><h2>OS <span th:text="${os.numeroProtocolo}"></span></h2><span class="badge bg-secondary" th:text="${os.status.descricao}"></span></div>
+    <div class="card shadow-sm p-4 my-3">
+        <p><strong>Cliente:</strong> <span th:text="${os.cliente.nome}"></span></p>
+        <p><strong>Equipamento:</strong> <span th:text="${os.equipamento.tipo + ' - ' + os.equipamento.marca + ' ' + os.equipamento.modelo}"></span></p>
+        <p><strong>Técnico responsável:</strong> <span th:text="${os.tecnicoResponsavel != null ? os.tecnicoResponsavel.nome : 'Não atribuído'}"></span></p>
+        <p><strong>Abertura:</strong> <span th:text="${#temporals.format(os.dataAbertura, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <p><strong>Defeito relatado:</strong> <span th:text="${os.defeitoRelatado}"></span></p>
+        <p class="mb-0"><strong>Total:</strong> <span class="fw-bold" th:text="${'R$ ' + #numbers.formatDecimal(os.valorTotal, 1, 'POINT', 2, 'COMMA')}"></span></p>
+    </div>
+</main></body></html>

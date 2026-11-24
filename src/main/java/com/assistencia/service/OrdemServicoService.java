@@ -1,11 +1,16 @@
 package com.assistencia.service;
 
+import com.assistencia.model.Cliente;
+import com.assistencia.model.Equipamento;
+import com.assistencia.model.Usuario;
 import com.assistencia.model.ItemOrdemServico;
 import com.assistencia.model.OrdemServico;
 import com.assistencia.model.enums.StatusOrdemServico;
 import com.assistencia.repository.OrdemServicoRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +27,42 @@ public class OrdemServicoService {
     public OrdemServico buscarPorId(Long id) {
         return ordemServicoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Ordem de servico nao encontrada: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrdemServico> listarTodas() {
+        return ordemServicoRepository.findAll();
+    }
+
+    /** Abre a ordem com os relacionamentos validados, técnico logado e protocolo único. */
+    @Transactional
+    public OrdemServico abrirOrdem(Cliente cliente, Equipamento equipamento,
+                                  Usuario tecnicoLogado, String defeitoRelatado) {
+        if (cliente == null || cliente.getId() == null) {
+            throw new IllegalArgumentException("Selecione um cliente cadastrado.");
+        }
+        if (equipamento == null || equipamento.getId() == null
+                || equipamento.getCliente() == null
+                || !cliente.getId().equals(equipamento.getCliente().getId())) {
+            throw new IllegalArgumentException("O equipamento deve pertencer ao cliente selecionado.");
+        }
+        if (tecnicoLogado == null || tecnicoLogado.getId() == null
+                || !Boolean.TRUE.equals(tecnicoLogado.getAtivo())) {
+            throw new IllegalArgumentException("O usuario logado deve estar ativo.");
+        }
+        if (defeitoRelatado == null || defeitoRelatado.isBlank()
+                || defeitoRelatado.trim().length() > 1000) {
+            throw new IllegalArgumentException("Informe o defeito relatado (ate 1000 caracteres).");
+        }
+
+        OrdemServico ordem = new OrdemServico();
+        ordem.setNumeroProtocolo("OS-" + UUID.randomUUID().toString()
+                .replace("-", "").substring(0, 16).toUpperCase());
+        ordem.setCliente(cliente);
+        ordem.setEquipamento(equipamento);
+        ordem.setTecnicoResponsavel(tecnicoLogado);
+        ordem.setDefeitoRelatado(defeitoRelatado.trim());
+        return ordemServicoRepository.save(ordem);
     }
 
     // Calcula o valor do item usando o preco registrado na OS, nao o preco atual do catalogo.
