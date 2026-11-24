@@ -9,6 +9,9 @@ import com.assistencia.service.OrdemServicoService;
 import com.assistencia.service.ServicoService;
 import com.assistencia.service.UsuarioService;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,8 +47,26 @@ public class OrdemServicoController {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("ordens", ordemServicoService.listarTodas());
+    public String listar(
+            @RequestParam(required = false) StatusOrdemServico status,
+            @RequestParam(required = false) String clienteNome,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            Model model) {
+
+        List<OrdemServico> ordens = ordemServicoService.buscarComFiltros(status, clienteNome, dataInicio, dataFim);
+        boolean filtrosAtivos = status != null
+                || (clienteNome != null && !clienteNome.isBlank())
+                || dataInicio != null
+                || dataFim != null;
+
+        model.addAttribute("ordens", ordens);
+        model.addAttribute("statusList", StatusOrdemServico.values());
+        model.addAttribute("statusSelecionado", status);
+        model.addAttribute("clienteNomeFiltro", clienteNome);
+        model.addAttribute("dataInicioFiltro", dataInicio);
+        model.addAttribute("dataFimFiltro", dataFim);
+        model.addAttribute("filtrosAtivos", filtrosAtivos);
         return "ordens/lista";
     }
 

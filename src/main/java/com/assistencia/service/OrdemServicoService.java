@@ -10,6 +10,7 @@ import com.assistencia.model.enums.StatusOrdemServico;
 import com.assistencia.repository.OrdemServicoRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,29 @@ public class OrdemServicoService {
     @Transactional(readOnly = true)
     public List<OrdemServico> listarTodas() {
         return ordemServicoRepository.findAll();
+    }
+
+    /**
+     * Consulta avançada com filtros combinados (status, cliente e intervalo de datas).
+     * Utiliza as queries customizadas com JPQL no OrdemServicoRepository.
+     */
+    @Transactional(readOnly = true)
+    public List<OrdemServico> buscarComFiltros(StatusOrdemServico status, String clienteNome,
+                                               LocalDate dataInicio, LocalDate dataFim) {
+        boolean semFiltros = status == null
+                && (clienteNome == null || clienteNome.isBlank())
+                && dataInicio == null
+                && dataFim == null;
+
+        if (semFiltros) {
+            return ordemServicoRepository.findAll();
+        }
+
+        LocalDateTime inicio = (dataInicio != null) ? dataInicio.atStartOfDay() : null;
+        LocalDateTime fim = (dataFim != null) ? dataFim.atTime(23, 59, 59) : null;
+        String nome = (clienteNome != null && !clienteNome.isBlank()) ? clienteNome.trim() : null;
+
+        return ordemServicoRepository.buscarComFiltros(status, nome, inicio, fim);
     }
 
     /** Abre a ordem com os relacionamentos validados, técnico logado e protocolo único. */
