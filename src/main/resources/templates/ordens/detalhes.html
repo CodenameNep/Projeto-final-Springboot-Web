@@ -15,6 +15,10 @@
         <p><strong>Técnico responsável:</strong> <span th:text="${os.tecnicoResponsavel != null ? os.tecnicoResponsavel.nome : 'Não atribuído'}"></span></p>
         <p><strong>Abertura:</strong> <span th:text="${#temporals.format(os.dataAbertura, 'dd/MM/yyyy HH:mm')}"></span></p>
         <p><strong>Defeito relatado:</strong> <span th:text="${os.defeitoRelatado}"></span></p>
+        <p th:if="${os.dataFinalizacao != null}"><strong>Finalização:</strong>
+            <span th:text="${#temporals.format(os.dataFinalizacao, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <div th:if="${os.laudoTecnico != null}"><strong>Laudo técnico:</strong>
+            <p class="text-pre-wrap" style="white-space:pre-wrap" th:text="${os.laudoTecnico}"></p></div>
         <p class="mb-0"><strong>Total:</strong> <span class="fw-bold" th:text="${'R$ ' + #numbers.formatDecimal(os.valorTotal, 1, 'POINT', 2, 'COMMA')}"></span></p>
     </div>
     <section class="card shadow-sm p-4 mb-3">
@@ -64,6 +68,24 @@
             <div class="col-md-3"><button class="btn btn-primary w-100" type="submit">Adicionar</button></div>
         </form>
     </section>
+    <section th:if="${os.status.name() == 'ABERTA'}" class="card shadow-sm p-4 mb-3">
+        <h3 class="h5">Iniciar atendimento</h3>
+        <p class="text-muted">Altera o status de ABERTA para EM ANDAMENTO.</p>
+        <form th:action="@{/ordens/{id}/iniciar(id=${os.id})}" method="post" data-os-ajax>
+            <button type="submit" class="btn btn-primary">Iniciar atendimento</button>
+        </form>
+    </section>
+    <section th:if="${os.status.name() == 'EM_ANDAMENTO'}" class="card shadow-sm p-4 mb-3">
+        <h3 class="h5">Finalizar ordem de serviço</h3>
+        <form th:action="@{/ordens/{id}/finalizar(id=${os.id})}" method="post" data-os-ajax>
+            <label for="laudoTecnico" class="form-label">Laudo técnico / observações *</label>
+            <textarea id="laudoTecnico" name="laudoTecnico" class="form-control mb-3"
+                      rows="4" maxlength="1000" required></textarea>
+            <button type="submit" class="btn btn-success">Finalizar OS</button>
+        </form>
+    </section>
+    <div th:if="${os.status.name() == 'FINALIZADA' || os.status.name() == 'CANCELADA'}"
+         class="alert alert-secondary">Ordem encerrada: inclusão, remoção e alteração de itens bloqueadas.</div>
 </main>
 <script>
     // Atualiza a seção de detalhes sem recarregar a página inteira após cada operação.

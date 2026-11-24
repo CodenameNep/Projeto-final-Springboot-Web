@@ -10,6 +10,7 @@ import com.assistencia.model.enums.StatusOrdemServico;
 import com.assistencia.repository.OrdemServicoRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -170,11 +171,33 @@ public class OrdemServicoService {
         return ordemServicoRepository.save(ordemServico);
     }
 
+    /** Encerramento com laudo obrigatório e data/hora, tudo na mesma transação. */
+    @Transactional
+    public OrdemServico finalizarOrdem(Long ordemId, String laudoTecnico) {
+        OrdemServico ordem = buscarPorId(ordemId);
+        if (ordem.getStatus() != StatusOrdemServico.EM_ANDAMENTO) {
+            throw new IllegalStateException("A OS precisa estar EM_ANDAMENTO para ser finalizada.");
+        }
+        if (laudoTecnico == null || laudoTecnico.isBlank()
+                || laudoTecnico.trim().length() > 1000) {
+            throw new IllegalArgumentException("Informe o laudo tecnico (ate 1000 caracteres).");
+        }
+        calcularValorTotal(ordem);
+        ordem.setLaudoTecnico(laudoTecnico.trim());
+        ordem.setDataFinalizacao(LocalDateTime.now());
+        ordem.setStatus(StatusOrdemServico.FINALIZADA);
+        return ordemServicoRepository.save(ordem);
+    }
+
     // So permite avancos validos no fluxo da ordem de servico.
     @Transactional
     public OrdemServico atualizarStatus(Long ordemServicoId, StatusOrdemServico novoStatus) {
         if (novoStatus == null) {
             throw new IllegalArgumentException("Informe o novo status da ordem de servico.");
+        }
+        // Ninguém pode encerrar a OS sem laudo e data, nem por outro controller.
+        if (novoStatus == StatusOrdemServico.FINALIZADA) {
+            throw new IllegalStateException("Para finalizar, use finalizarOrdem com laudo tecnico.");
         }
 
         OrdemServico ordemServico = buscarPorId(ordemServicoId);

@@ -2,6 +2,7 @@ package com.assistencia.controller;
 
 import com.assistencia.dto.AberturaOrdemServicoDTO;
 import com.assistencia.model.OrdemServico;
+import com.assistencia.model.enums.StatusOrdemServico;
 import com.assistencia.service.ClienteService;
 import com.assistencia.service.EquipamentoService;
 import com.assistencia.service.OrdemServicoService;
@@ -88,6 +89,30 @@ public class OrdemServicoController {
             flash.addFlashAttribute("erro", ex.getMessage());
             return "redirect:/ordens";
         }
+    }
+
+    @PostMapping("/{id}/iniciar")
+    public String iniciar(@PathVariable Long id, RedirectAttributes flash) {
+        try {
+            ordemServicoService.atualizarStatus(id,
+                    StatusOrdemServico.EM_ANDAMENTO);
+            flash.addFlashAttribute("sucesso", "OS iniciada com sucesso.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            flash.addFlashAttribute("erro", ex.getMessage());
+        }
+        return "redirect:/ordens/" + id;
+    }
+
+    @PostMapping("/{id}/finalizar")
+    public String finalizar(@PathVariable Long id, @RequestParam String laudoTecnico,
+                            RedirectAttributes flash) {
+        try {
+            ordemServicoService.finalizarOrdem(id, laudoTecnico);
+            flash.addFlashAttribute("sucesso", "OS finalizada com laudo e data de conclusão.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            flash.addFlashAttribute("erro", ex.getMessage());
+        }
+        return "redirect:/ordens/" + id;
     }
 
     @PostMapping("/{id}/itens")

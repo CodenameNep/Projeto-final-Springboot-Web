@@ -94,9 +94,11 @@ class OrdemServicoServiceTest {
         when(repository.save(os)).thenReturn(os);
 
         service.atualizarStatus(7L, StatusOrdemServico.EM_ANDAMENTO);
-        service.atualizarStatus(7L, StatusOrdemServico.FINALIZADA);
+        service.finalizarOrdem(7L, "Troca de tela concluida e testada.");
 
         assertEquals(StatusOrdemServico.FINALIZADA, os.getStatus());
+        assertEquals("Troca de tela concluida e testada.", os.getLaudoTecnico());
+        org.junit.jupiter.api.Assertions.assertNotNull(os.getDataFinalizacao());
         verify(repository, Mockito.times(2)).save(os);
     }
 
