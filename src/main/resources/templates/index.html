@@ -19,6 +19,11 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navContent">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" th:href="@{/clientes}">Clientes</a>
+                    </li>
+                </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item me-3" sec:authorize="hasRole('ADMIN')">
                         <a class="nav-link text-light" th:href="@{/usuarios}">Gerenciar usuários</a>
