@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
@@ -9,62 +9,128 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" th:href="@{/}">
-                <i class="bi bi-tools text-primary me-2"></i>TechFix OS
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navContent">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link text-light" th:href="@{/ordens}">Ordens de Serviço</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" th:href="@{/clientes}">Clientes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" th:href="@{/equipamentos}">Equipamentos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" th:href="@{/servicos}">Serviços</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item me-3" sec:authorize="hasRole('ADMIN')">
-                        <a class="nav-link text-light" th:href="@{/usuarios}">Gerenciar usuários</a>
-                    </li>
-                    <li class="nav-item me-3 text-light">
-                        <small>Conectado como: </small>
-                        <strong sec:authentication="name" class="text-info">usuario</strong>
-                    </li>
-                    <li class="nav-item">
-                        <form th:action="@{/logout}" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-outline-light btn-sm">
-                                <i class="bi bi-box-arrow-right me-1"></i>Sair
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/}"><i class="bi bi-tools text-primary me-2"></i>TechFix OS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent" aria-label="Abrir menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navContent">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link text-light" th:href="@{/ordens}">Ordens de Serviço</a></li>
+                <li class="nav-item"><a class="nav-link text-light" th:href="@{/clientes}">Clientes</a></li>
+                <li class="nav-item"><a class="nav-link text-light" th:href="@{/equipamentos}">Equipamentos</a></li>
+                <li class="nav-item"><a class="nav-link text-light" th:href="@{/servicos}">Serviços</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item me-3" sec:authorize="hasRole('ADMIN')"><a class="nav-link text-light" th:href="@{/usuarios}">Gerenciar usuários</a></li>
+                <li class="nav-item me-3 text-light"><small>Conectado como: </small><strong sec:authentication="name" class="text-info">usuario</strong></li>
+                <li class="nav-item">
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right me-1"></i>Sair</button>
+                    </form>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Conteúdo Principal -->
-    <div class="container py-5">
-        <div class="card border-0 shadow-sm p-4 text-center">
-            <h2 class="fw-bold mb-2">Bem-vindo ao TechFix OS</h2>
-            <p class="text-muted">Sistema de Gestão de Assistência Técnica e Ordens de Serviço</p>
-            <div class="alert alert-success my-3 text-start">
-                <h5 class="alert-heading"><i class="bi bi-check-circle-fill me-2"></i>Status da Aplicação: Online</h5>
-                <p class="mb-0 small">Autenticação configurada com sucesso com Spring Security e persistência de dados relacional via Spring Data JPA.</p>
-            </div>
+<main class="container py-4">
+    <div th:if="${erro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${erro}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+    <div th:if="${sucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${sucesso}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Painel gerencial</h1>
+            <p class="text-secondary mb-0">Acompanhe as ordens de serviço e os resultados da assistência técnica.</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/ordens/nova}"><i class="bi bi-plus-circle me-1"></i>Abrir ordem de serviço</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="d-flex justify-content-between align-items-center text-secondary mb-2">
+                    <span class="fw-semibold">OS abertas</span><i class="bi bi-clipboard-plus fs-4"></i>
+                </div>
+                <div class="display-6 fw-bold text-primary" th:text="${dashboard.abertas}">0</div>
+                <a th:href="@{/ordens(status='ABERTA')}" class="small text-decoration-none">Ver abertas</a>
+            </div></div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="d-flex justify-content-between align-items-center text-secondary mb-2">
+                    <span class="fw-semibold">Em andamento</span><i class="bi bi-wrench-adjustable fs-4"></i>
+                </div>
+                <div class="display-6 fw-bold" th:text="${dashboard.emAndamento}">0</div>
+                <a th:href="@{/ordens(status='EM_ANDAMENTO')}" class="small text-decoration-none">Ver atendimentos</a>
+            </div></div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="d-flex justify-content-between align-items-center text-secondary mb-2">
+                    <span class="fw-semibold">OS finalizadas</span><i class="bi bi-check-circle fs-4"></i>
+                </div>
+                <div class="display-6 fw-bold text-success" th:text="${dashboard.finalizadas}">0</div>
+                <a th:href="@{/ordens(status='FINALIZADA')}" class="small text-decoration-none">Ver concluídas</a>
+            </div></div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <div class="d-flex justify-content-between align-items-center text-secondary mb-2">
+                    <span class="fw-semibold">Faturamento do mês</span><i class="bi bi-cash-stack fs-4"></i>
+                </div>
+                <div class="h2 fw-bold text-success mb-1"
+                     th:text="${'R$ ' + #numbers.formatDecimal(dashboard.faturamentoMes, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</div>
+                <small class="text-secondary" th:text="${dashboard.competencia}">mês atual</small>
+            </div></div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <h2 class="h6 fw-bold">Visão geral</h2>
+                <div class="d-flex justify-content-between py-2 border-bottom"><span>Total de OS</span><strong th:text="${dashboard.total}">0</strong></div>
+                <div class="d-flex justify-content-between py-2 border-bottom"><span>Aguardando peças</span><strong th:text="${dashboard.aguardandoPecas}">0</strong></div>
+                <div class="d-flex justify-content-between py-2"><span>OS canceladas</span><strong th:text="${dashboard.total - dashboard.abertas - dashboard.emAndamento - dashboard.aguardandoPecas - dashboard.finalizadas}">0</strong></div>
+                <p class="small text-secondary mt-3 mb-0">O faturamento soma os valores das ordens finalizadas no mês selecionado, não pagamentos confirmados.</p>
+            </div></div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                    <h2 class="h6 fw-bold mb-0">Últimas ordens de serviço</h2>
+                    <a class="small text-decoration-none" th:href="@{/ordens}">Ver todas</a>
+                </div>
+                <div class="card-body pt-2">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead><tr><th>Protocolo</th><th>Cliente</th><th>Status</th><th></th></tr></thead>
+                            <tbody>
+                                <tr th:each="os : ${dashboard.ultimasOrdens}">
+                                    <td class="fw-semibold" th:text="${os.numeroProtocolo}">OS-123</td>
+                                    <td th:text="${os.cliente.nome}">Cliente</td>
+                                    <td><span class="badge text-bg-light border" th:text="${os.status.descricao}">Aberta</span></td>
+                                    <td class="text-end"><a th:href="@{/ordens/{id}(id=${os.id})}" class="btn btn-outline-primary btn-sm">Ver OS</a></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(dashboard.ultimasOrdens)}">
+                                    <td colspan="4" class="text-center text-secondary py-4">Nenhuma ordem cadastrada ainda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

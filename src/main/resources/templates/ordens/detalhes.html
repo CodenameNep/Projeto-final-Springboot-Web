@@ -9,6 +9,9 @@
     <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
     <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2"><h2>OS <span th:text="${os.numeroProtocolo}"></span></h2><span class="badge bg-secondary" th:text="${os.status.descricao}"></span></div>
+    <div class="mb-3">
+        <a class="btn btn-outline-primary" th:href="@{/ordens/{id}/imprimir(id=${os.id})}" target="_blank" rel="noopener noreferrer">Imprimir comprovante / Salvar PDF</a>
+    </div>
     <div class="card shadow-sm p-4 my-3">
         <p><strong>Cliente:</strong> <span th:text="${os.cliente.nome}"></span></p>
         <p><strong>Equipamento:</strong> <span th:text="${os.equipamento.tipo + ' - ' + os.equipamento.marca + ' ' + os.equipamento.modelo}"></span></p>

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -50,4 +51,20 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
            "WHERE LOWER(os.cliente.nome) LIKE LOWER(CONCAT('%', :nome, '%')) " +
            "ORDER BY os.dataAbertura DESC")
     List<OrdemServico> buscarPorNomeClientePersonalizado(@Param("nome") String nome);
+
+    // Commit 15: consultas de agregacao executadas pelo banco, nao por loops Java.
+    @Query("SELECT COUNT(os) FROM OrdemServico os WHERE os.status = :status")
+    long contarPorStatus(@Param("status") StatusOrdemServico status);
+
+    // Contabiliza apenas OS finalizadas DENTRO do mes, evitando somar OS em aberto.
+    @Query("SELECT SUM(os.valorTotal) FROM OrdemServico os " +
+           "WHERE os.status = :status " +
+           "AND os.dataFinalizacao >= :inicio " +
+           "AND os.dataFinalizacao < :fim")
+    BigDecimal somarFaturamentoFinalizadoNoPeriodo(
+            @Param("status") StatusOrdemServico status,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim);
+
+    List<OrdemServico> findTop5ByOrderByDataAberturaDesc();
 }

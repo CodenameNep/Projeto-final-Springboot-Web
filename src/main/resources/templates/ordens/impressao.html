@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Comprovante - ' + os.numeroProtocolo}">Comprovante de atendimento</title>
+    <style>
+        :root { color-scheme: light; }
+        body { margin: 0; background: #eef1f5; color: #222; font: 14px/1.5 Arial, sans-serif; }
+        .barra-acoes { max-width: 810px; margin: 18px auto; display: flex; justify-content: space-between; gap: 12px; }
+        .botao { border: 1px solid #234c78; border-radius: 7px; padding: 9px 14px; color: #234c78; text-decoration: none; background: white; font: inherit; cursor: pointer; }
+        .botao-principal { background: #234c78; color: white; }
+        .folha { box-sizing: border-box; background: #fff; max-width: 810px; min-height: 1080px; margin: 0 auto 28px; padding: 42px 48px; box-shadow: 0 3px 20px #00000012; }
+        .cabecalho { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 2px solid #234c78; padding-bottom: 20px; }
+        .marca { font-size: 24px; color: #234c78; font-weight: 800; letter-spacing: .3px; }
+        .subtitulo { font-size: 13px; color: #666; }
+        .protocolo { text-align: right; font-size: 13px; }
+        .protocolo strong { display: block; font-size: 17px; }
+        h1 { font-size: 20px; margin: 24px 0 10px; }
+        h2 { font-size: 13px; letter-spacing: .5px; text-transform: uppercase; color: #234c78; margin: 22px 0 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+        .campo { margin-bottom: 5px; }
+        .rotulo { color: #666; font-size: 12px; display: block; }
+        .valor { font-weight: 600; overflow-wrap: anywhere; }
+        .bloco-texto { white-space: pre-wrap; overflow-wrap: anywhere; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 13px; }
+        th { text-align: left; background: #eef2f7; color: #234c78; padding: 9px 8px; }
+        td { border-bottom: 1px solid #ddd; padding: 9px 8px; }
+        th.num, td.num { text-align: right; white-space: nowrap; }
+        .total { margin-top: 16px; text-align: right; font-size: 20px; font-weight: 800; }
+        .rodape { border-top: 1px solid #ddd; margin-top: 32px; padding-top: 12px; color: #666; font-size: 11px; }
+        @page { size: A4; margin: 15mm; }
+        @media print {
+            html, body { margin: 0; background: white; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .barra-acoes { display: none !important; }
+            .folha { max-width: none; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+            h2, .cabecalho, .total { break-after: avoid; }
+            tr { break-inside: avoid; }
+        }
+        @media (max-width: 620px) {
+            .barra-acoes { padding: 0 16px; }
+            .folha { padding: 24px 18px; min-height: 0; }
+            .grade { grid-template-columns: 1fr; }
+            .cabecalho { flex-direction: column; }
+            .protocolo { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+<div class="barra-acoes">
+    <a class="botao" th:href="@{/ordens/{id}(id=${os.id})}">Voltar aos detalhes</a>
+    <button class="botao botao-principal" type="button" onclick="window.print()">Imprimir / Salvar em PDF</button>
+</div>
+<main class="folha">
+    <header class="cabecalho">
+        <div><div class="marca">TechFix OS</div><div class="subtitulo">Assistência técnica — comprovante de atendimento</div></div>
+        <div class="protocolo"><span>Protocolo</span><strong th:text="${os.numeroProtocolo}">OS-000000</strong></div>
+    </header>
+    <h1>Comprovante da Ordem de Serviço</h1>
+    <div class="grade">
+        <div class="campo"><span class="rotulo">Status</span><span class="valor" th:text="${os.status.descricao}">Aberta</span></div>
+        <div class="campo"><span class="rotulo">Data da abertura</span><span class="valor" th:text="${#temporals.format(os.dataAbertura, 'dd/MM/yyyy HH:mm')}">01/01/2026</span></div>
+        <div class="campo" th:if="${os.dataFinalizacao != null}"><span class="rotulo">Data da finalização</span><span class="valor" th:text="${#temporals.format(os.dataFinalizacao, 'dd/MM/yyyy HH:mm')}"></span></div>
+        <div class="campo"><span class="rotulo">Técnico responsável</span><span class="valor" th:text="${os.tecnicoResponsavel != null ? os.tecnicoResponsavel.nome : 'Não atribuído'}"></span></div>
+    </div>
+    <h2>Dados do cliente</h2>
+    <div class="grade">
+        <div class="campo"><span class="rotulo">Nome</span><span class="valor" th:text="${os.cliente.nome}"></span></div>
+        <div class="campo"><span class="rotulo">Telefone</span><span th:text="${os.cliente.telefone != null ? os.cliente.telefone : '-'}"></span></div>
+        <div class="campo"><span class="rotulo">E-mail</span><span th:text="${os.cliente.email != null && !os.cliente.email.isEmpty() ? os.cliente.email : '-'}"></span></div>
+        <div class="campo" th:if="${os.cliente.endereco != null}">
+            <span class="rotulo">Endereço</span>
+            <span th:text="${os.cliente.endereco.logradouro + ', ' + os.cliente.endereco.numero + ' - ' + os.cliente.endereco.bairro + ', ' + os.cliente.endereco.cidade + '/' + os.cliente.endereco.uf + ' - CEP ' + os.cliente.endereco.cep}"></span>
+        </div>
+    </div>
+    <h2>Equipamento recebido</h2>
+    <div class="grade">
+        <div class="campo"><span class="rotulo">Tipo</span><span class="valor" th:text="${os.equipamento.tipo}"></span></div>
+        <div class="campo"><span class="rotulo">Marca e modelo</span><span class="valor" th:text="${os.equipamento.marca + ' ' + os.equipamento.modelo}"></span></div>
+        <div class="campo"><span class="rotulo">Número de série</span><span th:text="${os.equipamento.numeroSerie != null && !os.equipamento.numeroSerie.isBlank() ? os.equipamento.numeroSerie : '-'}"></span></div>
+    </div>
+    <h2>Descrição do atendimento</h2>
+    <div class="campo"><span class="rotulo">Defeito informado</span><div class="bloco-texto" th:text="${os.defeitoRelatado}"></div></div>
+    <div class="campo" th:if="${os.laudoTecnico != null}"><span class="rotulo">Laudo técnico</span><div class="bloco-texto" th:text="${os.laudoTecnico}"></div></div>
+    <h2>Serviços registrados</h2>
+    <table>
+        <thead><tr><th>Serviço</th><th class="num">Qtd.</th><th class="num">Valor unitário</th><th class="num">Subtotal</th></tr></thead>
+        <tbody>
+            <tr th:each="item : ${os.itens}">
+                <td th:text="${item.servico.nome}">Serviço</td>
+                <td class="num" th:text="${item.quantidade}">1</td>
+                <td class="num" th:text="${'R$ ' + #numbers.formatDecimal(item.precoUnitario, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                <td class="num" th:text="${'R$ ' + #numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(os.itens)}"><td colspan="4" style="text-align:center;color:#777">Nenhum serviço adicionado.</td></tr>
+        </tbody>
+    </table>
+    <div class="total" th:text="${'Total: R$ ' + #numbers.formatDecimal(os.valorTotal, 1, 'POINT', 2, 'COMMA')}">Total: R$ 0,00</div>
+    <footer class="rodape">
+        Emitido em <span th:text="${#temporals.format(dataEmissao, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>.
+        Comprovante de atendimento da assistência técnica; não substitui nota fiscal.
+    </footer>
+</main>
+</body>
+</html>
