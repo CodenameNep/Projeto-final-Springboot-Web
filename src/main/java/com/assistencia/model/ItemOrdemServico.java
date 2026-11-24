@@ -9,6 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -32,12 +35,18 @@ public class ItemOrdemServico implements Serializable {
     @JoinColumn(name = "servico_id", nullable = false)
     private Servico servico;
 
+    @NotNull(message = "Informe a quantidade.")
+    @Positive(message = "A quantidade deve ser maior que zero.")
     @Column(nullable = false)
     private Integer quantidade = 1;
 
+    @NotNull(message = "Informe o preco unitario.")
+    @DecimalMin(value = "0.0", message = "O preco unitario nao pode ser negativo.")
     @Column(name = "preco_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precoUnitario;
 
+    @NotNull(message = "Informe o subtotal.")
+    @DecimalMin(value = "0.0", message = "O subtotal nao pode ser negativo.")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
@@ -54,53 +63,23 @@ public class ItemOrdemServico implements Serializable {
         }
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public OrdemServico getOrdemServico() { return ordemServico; }
+    public void setOrdemServico(OrdemServico ordemServico) { this.ordemServico = ordemServico; }
 
-    public OrdemServico getOrdemServico() {
-        return ordemServico;
-    }
+    public Servico getServico() { return servico; }
+    public void setServico(Servico servico) { this.servico = servico; }
 
-    public void setOrdemServico(OrdemServico ordemServico) {
-        this.ordemServico = ordemServico;
-    }
+    public Integer getQuantidade() { return quantidade; }
+    public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
 
-    public Servico getServico() {
-        return servico;
-    }
+    public BigDecimal getPrecoUnitario() { return precoUnitario; }
+    public void setPrecoUnitario(BigDecimal precoUnitario) { this.precoUnitario = precoUnitario; }
 
-    public void setServico(Servico servico) {
-        this.servico = servico;
-    }
-
-    public Integer getQuantidade() {
-        return quantidade;
-    }
-
-    public void setQuantidade(Integer quantidade) {
-        this.quantidade = quantidade;
-    }
-
-    public BigDecimal getPrecoUnitario() {
-        return precoUnitario;
-    }
-
-    public void setPrecoUnitario(BigDecimal precoUnitario) {
-        this.precoUnitario = precoUnitario;
-    }
-
-    public BigDecimal getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
-    }
+    public BigDecimal getSubtotal() { return subtotal; }
+    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
 
     @Override
     public boolean equals(Object o) {
@@ -111,7 +90,5 @@ public class ItemOrdemServico implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public int hashCode() { return Objects.hash(id); }
 }

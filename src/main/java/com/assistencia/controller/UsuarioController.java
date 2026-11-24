@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/usuarios")
@@ -48,7 +49,7 @@ public class UsuarioController {
 
     @PostMapping
     public String cadastrar(@Valid @ModelAttribute("usuario") UsuarioCadastroDTO dados,
-                            BindingResult erros) {
+                            BindingResult erros, RedirectAttributes flash) {
         if (erros.hasErrors()) {
             return "usuarios/formulario";
         }
@@ -68,6 +69,7 @@ public class UsuarioController {
             return "usuarios/formulario";
         }
 
-        return "redirect:/usuarios?sucesso";
+        flash.addFlashAttribute("sucesso", "Usuario cadastrado com sucesso!");
+        return "redirect:/usuarios";
     }
 }

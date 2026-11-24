@@ -2,15 +2,18 @@ package com.assistencia.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-/** Dados recebidos da tela de abertura da OS. IDs são validados novamente no service. */
+/** Dados recebidos da tela de abertura da OS. IDs sao validados novamente no service. */
 public class AberturaOrdemServicoDTO {
 
     @NotNull(message = "Selecione um cliente.")
+    @Positive(message = "Selecione um cliente valido.")
     private Long clienteId;
 
     @NotNull(message = "Selecione um equipamento.")
+    @Positive(message = "Selecione um equipamento valido.")
     private Long equipamentoId;
 
     @NotBlank(message = "Descreva o defeito relatado.")

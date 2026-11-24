@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "tb_equipamento")
@@ -17,19 +20,27 @@ public class Equipamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Informe o tipo do equipamento.")
+    @Size(max = 80)
     @Column(nullable = false, length = 80)
     private String tipo;
 
+    @NotBlank(message = "Informe a marca do equipamento.")
+    @Size(max = 80)
     @Column(nullable = false, length = 80)
     private String marca;
 
+    @NotBlank(message = "Informe o modelo do equipamento.")
+    @Size(max = 100)
     @Column(nullable = false, length = 100)
     private String modelo;
 
+    @Size(max = 100)
     @Column(length = 100)
     private String numeroSerie;
 
     // Varios equipamentos podem pertencer ao mesmo cliente.
+    @NotNull(message = "Vincule o equipamento a um cliente.")
     @ManyToOne(optional = false)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;

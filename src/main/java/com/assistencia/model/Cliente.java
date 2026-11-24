@@ -11,6 +11,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +25,17 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Informe o nome do cliente.")
+    @Size(max = 100)
     @Column(nullable = false, length = 100)
     private String nome;
 
+    @Size(max = 20)
     @Column(length = 20)
     private String telefone;
 
+    @Email(message = "Informe um e-mail valido.")
+    @Size(max = 120)
     @Column(length = 120)
     private String email;
 
