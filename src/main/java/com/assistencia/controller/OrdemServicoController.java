@@ -5,6 +5,7 @@ import com.assistencia.model.OrdemServico;
 import com.assistencia.service.ClienteService;
 import com.assistencia.service.EquipamentoService;
 import com.assistencia.service.OrdemServicoService;
+import com.assistencia.service.ServicoService;
 import com.assistencia.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -26,15 +28,18 @@ public class OrdemServicoController {
     private final ClienteService clienteService;
     private final EquipamentoService equipamentoService;
     private final UsuarioService usuarioService;
+    private final ServicoService servicoService;
 
     public OrdemServicoController(OrdemServicoService ordemServicoService,
                                   ClienteService clienteService,
                                   EquipamentoService equipamentoService,
-                                  UsuarioService usuarioService) {
+                                  UsuarioService usuarioService,
+                                  ServicoService servicoService) {
         this.ordemServicoService = ordemServicoService;
         this.clienteService = clienteService;
         this.equipamentoService = equipamentoService;
         this.usuarioService = usuarioService;
+        this.servicoService = servicoService;
     }
 
     @GetMapping
@@ -77,11 +82,48 @@ public class OrdemServicoController {
     public String detalhes(@PathVariable Long id, Model model, RedirectAttributes flash) {
         try {
             model.addAttribute("os", ordemServicoService.buscarPorId(id));
+            model.addAttribute("servicos", servicoService.listarTodos());
             return "ordens/detalhes";
         } catch (IllegalArgumentException ex) {
             flash.addFlashAttribute("erro", ex.getMessage());
             return "redirect:/ordens";
         }
+    }
+
+    @PostMapping("/{id}/itens")
+    public String adicionarItem(@PathVariable Long id, @RequestParam Long servicoId,
+                                @RequestParam Integer quantidade, RedirectAttributes flash) {
+        try {
+            ordemServicoService.adicionarServico(id, servicoService.buscarPorId(servicoId), quantidade);
+            flash.addFlashAttribute("sucesso", "Serviço adicionado e total recalculado.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            flash.addFlashAttribute("erro", ex.getMessage());
+        }
+        return "redirect:/ordens/" + id;
+    }
+
+    @PostMapping("/{id}/itens/{itemId}/quantidade")
+    public String alterarQuantidade(@PathVariable Long id, @PathVariable Long itemId,
+                                    @RequestParam Integer quantidade, RedirectAttributes flash) {
+        try {
+            ordemServicoService.alterarQuantidade(id, itemId, quantidade);
+            flash.addFlashAttribute("sucesso", "Quantidade e total atualizados.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            flash.addFlashAttribute("erro", ex.getMessage());
+        }
+        return "redirect:/ordens/" + id;
+    }
+
+    @PostMapping("/{id}/itens/{itemId}/remover")
+    public String removerItem(@PathVariable Long id, @PathVariable Long itemId,
+                              RedirectAttributes flash) {
+        try {
+            ordemServicoService.removerServico(id, itemId);
+            flash.addFlashAttribute("sucesso", "Serviço removido e total recalculado.");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            flash.addFlashAttribute("erro", ex.getMessage());
+        }
+        return "redirect:/ordens/" + id;
     }
 
     private void carregarOpcoesAbertura(Model model) {

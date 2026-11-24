@@ -3,6 +3,7 @@ package com.assistencia.service;
 import com.assistencia.model.Cliente;
 import com.assistencia.model.Equipamento;
 import com.assistencia.model.Usuario;
+import com.assistencia.model.Servico;
 import com.assistencia.model.ItemOrdemServico;
 import com.assistencia.model.OrdemServico;
 import com.assistencia.model.enums.StatusOrdemServico;
@@ -63,6 +64,64 @@ public class OrdemServicoService {
         ordem.setTecnicoResponsavel(tecnicoLogado);
         ordem.setDefeitoRelatado(defeitoRelatado.trim());
         return ordemServicoRepository.save(ordem);
+    }
+
+    /** Registra o preço do catálogo no momento da inclusão (histórico imutável de preço). */
+    @Transactional
+    public OrdemServico adicionarServico(Long ordemId, Servico servico, Integer quantidade) {
+        OrdemServico ordem = buscarPorId(ordemId);
+        exigirEditavel(ordem);
+        validarQuantidade(quantidade);
+        if (servico == null || servico.getId() == null || servico.getPrecoBase() == null
+                || servico.getPrecoBase().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Selecione um servico cadastrado com preco valido.");
+        }
+        ItemOrdemServico item = new ItemOrdemServico(
+                ordem, servico, quantidade, servico.getPrecoBase());
+        ordem.getItens().add(item);
+        calcularValorTotal(ordem);
+        return ordemServicoRepository.save(ordem);
+    }
+
+    @Transactional
+    public OrdemServico alterarQuantidade(Long ordemId, Long itemId, Integer quantidade) {
+        OrdemServico ordem = buscarPorId(ordemId);
+        exigirEditavel(ordem);
+        validarQuantidade(quantidade);
+        ItemOrdemServico item = buscarItemDaOrdem(ordem, itemId);
+        item.setQuantidade(quantidade);
+        calcularValorTotal(ordem);
+        return ordemServicoRepository.save(ordem);
+    }
+
+    @Transactional
+    public OrdemServico removerServico(Long ordemId, Long itemId) {
+        OrdemServico ordem = buscarPorId(ordemId);
+        exigirEditavel(ordem);
+        ItemOrdemServico item = buscarItemDaOrdem(ordem, itemId);
+        ordem.getItens().remove(item); // orphanRemoval exclui o registro associado.
+        calcularValorTotal(ordem);
+        return ordemServicoRepository.save(ordem);
+    }
+
+    private void validarQuantidade(Integer quantidade) {
+        if (quantidade == null || quantidade <= 0) {
+            throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
+        }
+    }
+
+    private ItemOrdemServico buscarItemDaOrdem(OrdemServico ordem, Long itemId) {
+        return ordem.getItens().stream()
+                .filter(i -> i.getId() != null && i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Item nao encontrado nesta OS."));
+    }
+
+    private void exigirEditavel(OrdemServico ordem) {
+        if (ordem.getStatus() == StatusOrdemServico.FINALIZADA
+                || ordem.getStatus() == StatusOrdemServico.CANCELADA) {
+            throw new IllegalStateException("Nao e permitido alterar uma OS encerrada.");
+        }
     }
 
     // Calcula o valor do item usando o preco registrado na OS, nao o preco atual do catalogo.

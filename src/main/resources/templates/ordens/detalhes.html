@@ -17,4 +17,76 @@
         <p><strong>Defeito relatado:</strong> <span th:text="${os.defeitoRelatado}"></span></p>
         <p class="mb-0"><strong>Total:</strong> <span class="fw-bold" th:text="${'R$ ' + #numbers.formatDecimal(os.valorTotal, 1, 'POINT', 2, 'COMMA')}"></span></p>
     </div>
-</main></body></html>
+    <section class="card shadow-sm p-4 mb-3">
+        <h3 class="h5">Serviços da ordem</h3>
+        <div class="table-responsive"><table class="table align-middle">
+            <thead><tr><th>Serviço</th><th>Preço aplicado</th><th>Quantidade</th><th>Subtotal</th><th>Ações</th></tr></thead>
+            <tbody>
+                <tr th:each="item : ${os.itens}">
+                    <td th:text="${item.servico.nome}"></td>
+                    <td th:text="${'R$ ' + #numbers.formatDecimal(item.precoUnitario, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td>
+                        <form th:if="${os.status.name() != 'FINALIZADA' && os.status.name() != 'CANCELADA'}"
+                              th:action="@{/ordens/{id}/itens/{itemId}/quantidade(id=${os.id},itemId=${item.id})}"
+                              method="post" data-os-ajax class="d-flex gap-2">
+                            <input type="number" min="1" max="999999" name="quantidade" class="form-control form-control-sm" style="width:90px" th:value="${item.quantidade}" required>
+                            <button class="btn btn-sm btn-outline-primary" type="submit">Atualizar</button>
+                        </form>
+                        <span th:if="${os.status.name() == 'FINALIZADA' || os.status.name() == 'CANCELADA'}" th:text="${item.quantidade}"></span>
+                    </td>
+                    <td th:text="${'R$ ' + #numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td>
+                        <form th:if="${os.status.name() != 'FINALIZADA' && os.status.name() != 'CANCELADA'}"
+                              th:action="@{/ordens/{id}/itens/{itemId}/remover(id=${os.id},itemId=${item.id})}"
+                              method="post" data-os-ajax onsubmit="return confirm('Remover serviço da OS?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(os.itens)}"><td colspan="5" class="text-muted text-center">Nenhum serviço adicionado.</td></tr>
+            </tbody>
+        </table></div>
+        <strong class="text-end" th:text="${'Total: R$ ' + #numbers.formatDecimal(os.valorTotal, 1, 'POINT', 2, 'COMMA')}"></strong>
+    </section>
+    <section th:if="${os.status.name() != 'FINALIZADA' && os.status.name() != 'CANCELADA'}" class="card shadow-sm p-4 mb-3">
+        <h3 class="h5">Adicionar serviço</h3>
+        <form th:action="@{/ordens/{id}/itens(id=${os.id})}" method="post" data-os-ajax class="row g-3 align-items-end">
+            <div class="col-md-7"><label for="servicoId" class="form-label">Serviço</label>
+                <select name="servicoId" id="servicoId" class="form-select" required>
+                    <option value="">Selecione</option>
+                    <option th:each="s : ${servicos}" th:value="${s.id}"
+                            th:text="${s.nome + ' - R$ ' + #numbers.formatDecimal(s.precoBase, 1, 'POINT', 2, 'COMMA')}"></option>
+                </select>
+            </div>
+            <div class="col-md-2"><label for="quantidadeNova" class="form-label">Quantidade</label>
+                <input type="number" id="quantidadeNova" name="quantidade" min="1" max="999999" value="1" class="form-control" required>
+            </div>
+            <div class="col-md-3"><button class="btn btn-primary w-100" type="submit">Adicionar</button></div>
+        </form>
+    </section>
+</main>
+<script>
+    // Atualiza a seção de detalhes sem recarregar a página inteira após cada operação.
+    document.addEventListener('submit', async (event) => {
+        const form = event.target.closest('form[data-os-ajax]');
+        if (!form || event.defaultPrevented) return;
+        event.preventDefault();
+        const botao = form.querySelector('button[type="submit"]');
+        if (botao) botao.disabled = true;
+        try {
+            const resposta = await fetch(form.action, {
+                method: 'POST', body: new FormData(form), credentials: 'same-origin'
+            });
+            if (!resposta.ok) throw new Error('Falha ao atualizar a ordem de serviço.');
+            const documento = new DOMParser().parseFromString(await resposta.text(), 'text/html');
+            const proximo = documento.querySelector('#os-main');
+            if (!proximo) throw new Error('Não foi possível atualizar a tela.');
+            document.querySelector('#os-main').replaceWith(proximo);
+        } catch (erro) {
+            alert(erro.message);
+        } finally {
+            if (botao && botao.isConnected) botao.disabled = false;
+        }
+    });
+</script>
+</body></html>
