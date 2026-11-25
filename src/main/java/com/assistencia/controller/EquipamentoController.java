@@ -30,7 +30,7 @@ public class EquipamentoController {
     }
 
     @GetMapping
-    public String listar(@RequestParam(required = false) Long clienteId, Model model) {
+    public String listar(@RequestParam(name = "clienteId", required = false) Long clienteId, Model model) {
         if (clienteId != null) {
             model.addAttribute("equipamentos", equipamentoService.listarPorCliente(clienteId));
             model.addAttribute("clienteFiltro", clienteService.buscarPorId(clienteId));
@@ -41,7 +41,7 @@ public class EquipamentoController {
     }
 
     @GetMapping("/novo")
-    public String novo(@RequestParam(required = false) Long clienteId, Model model) {
+    public String novo(@RequestParam(name = "clienteId", required = false) Long clienteId, Model model) {
         EquipamentoDTO dto = new EquipamentoDTO();
         if (clienteId != null) {
             dto.setClienteId(clienteId);
@@ -52,7 +52,7 @@ public class EquipamentoController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(@PathVariable("id") Long id, Model model) {
         Equipamento eq = equipamentoService.buscarPorId(id);
         EquipamentoDTO dto = new EquipamentoDTO();
         dto.setId(eq.getId());
@@ -102,7 +102,7 @@ public class EquipamentoController {
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluir(@PathVariable Long id, RedirectAttributes flash) {
+    public String excluir(@PathVariable("id") Long id, RedirectAttributes flash) {
         try {
             equipamentoService.excluir(id);
             flash.addFlashAttribute("sucesso", "Equipamento excluído com sucesso!");

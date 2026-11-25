@@ -67,4 +67,13 @@ public class UsuarioService implements UserDetailsService {
         }
         return usuarioRepository.save(usuario);
     }
+
+    @Transactional
+    public void excluir(Long id, String emailUsuarioLogado) {
+        Usuario usuario = buscarPorId(id);
+        if (emailUsuarioLogado != null && usuario.getEmail().equalsIgnoreCase(emailUsuarioLogado)) {
+            throw new IllegalArgumentException("Você não pode excluir o seu próprio usuário conectado.");
+        }
+        usuarioRepository.delete(usuario);
+    }
 }

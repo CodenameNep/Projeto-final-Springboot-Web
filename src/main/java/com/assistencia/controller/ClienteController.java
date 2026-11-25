@@ -44,7 +44,7 @@ public class ClienteController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(@PathVariable("id") Long id, Model model) {
         Cliente cliente = clienteService.buscarPorId(id);
         ClienteDTO dto = new ClienteDTO();
         dto.setId(cliente.getId());
@@ -104,7 +104,7 @@ public class ClienteController {
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluir(@PathVariable Long id, RedirectAttributes flash) {
+    public String excluir(@PathVariable("id") Long id, RedirectAttributes flash) {
         try {
             clienteService.excluir(id);
             flash.addFlashAttribute("sucesso", "Cliente excluído com sucesso!");
@@ -117,7 +117,7 @@ public class ClienteController {
     // Endpoint REST para busca dinâmica de CEP via AJAX no frontend
     @GetMapping("/cep/{cep}")
     @ResponseBody
-    public ResponseEntity<?> buscarEnderecoPorCep(@PathVariable String cep) {
+    public ResponseEntity<?> buscarEnderecoPorCep(@PathVariable("cep") String cep) {
         try {
             Endereco endereco = viaCepService.buscarEnderecoPorCep(cep);
             return ResponseEntity.ok(endereco);

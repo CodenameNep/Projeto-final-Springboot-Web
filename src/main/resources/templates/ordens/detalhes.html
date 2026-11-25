@@ -35,7 +35,7 @@
                     <td>
                         <form th:if="${os.status.name() != 'FINALIZADA' && os.status.name() != 'CANCELADA'}"
                               th:action="@{/ordens/{id}/itens/{itemId}/quantidade(id=${os.id},itemId=${item.id})}"
-                              method="post" data-os-ajax class="d-flex gap-2">
+                              method="post" class="d-flex gap-2">
                             <input type="number" min="1" max="999999" name="quantidade" class="form-control form-control-sm" style="width:90px" th:value="${item.quantidade}" required>
                             <button class="btn btn-sm btn-outline-primary" type="submit">Atualizar</button>
                         </form>
@@ -45,7 +45,7 @@
                     <td>
                         <form th:if="${os.status.name() != 'FINALIZADA' && os.status.name() != 'CANCELADA'}"
                               th:action="@{/ordens/{id}/itens/{itemId}/remover(id=${os.id},itemId=${item.id})}"
-                              method="post" data-os-ajax onsubmit="return confirm('Remover serviço da OS?')">
+                              method="post" onsubmit="return confirm('Remover serviço da OS?')">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
                         </form>
                     </td>
@@ -57,7 +57,7 @@
     </section>
     <section th:if="${os.status.name() != 'FINALIZADA' && os.status.name() != 'CANCELADA'}" class="card shadow-sm p-4 mb-3">
         <h3 class="h5">Adicionar serviço</h3>
-        <form th:action="@{/ordens/{id}/itens(id=${os.id})}" method="post" data-os-ajax class="row g-3 align-items-end">
+        <form th:action="@{/ordens/{id}/itens(id=${os.id})}" method="post" class="row g-3 align-items-end">
             <div class="col-md-7"><label for="servicoId" class="form-label">Serviço</label>
                 <select name="servicoId" id="servicoId" class="form-select" required>
                     <option value="">Selecione</option>
@@ -74,13 +74,13 @@
     <section th:if="${os.status.name() == 'ABERTA'}" class="card shadow-sm p-4 mb-3">
         <h3 class="h5">Iniciar atendimento</h3>
         <p class="text-muted">Altera o status de ABERTA para EM ANDAMENTO.</p>
-        <form th:action="@{/ordens/{id}/iniciar(id=${os.id})}" method="post" data-os-ajax>
+        <form th:action="@{/ordens/{id}/iniciar(id=${os.id})}" method="post">
             <button type="submit" class="btn btn-primary">Iniciar atendimento</button>
         </form>
     </section>
     <section th:if="${os.status.name() == 'EM_ANDAMENTO'}" class="card shadow-sm p-4 mb-3">
         <h3 class="h5">Finalizar ordem de serviço</h3>
-        <form th:action="@{/ordens/{id}/finalizar(id=${os.id})}" method="post" data-os-ajax>
+        <form th:action="@{/ordens/{id}/finalizar(id=${os.id})}" method="post">
             <label for="laudoTecnico" class="form-label">Laudo técnico / observações *</label>
             <textarea id="laudoTecnico" name="laudoTecnico" class="form-control mb-3"
                       rows="4" maxlength="1000" required></textarea>
@@ -90,28 +90,5 @@
     <div th:if="${os.status.name() == 'FINALIZADA' || os.status.name() == 'CANCELADA'}"
          class="alert alert-secondary">Ordem encerrada: inclusão, remoção e alteração de itens bloqueadas.</div>
 </main>
-<script>
-    // Atualiza a seção de detalhes sem recarregar a página inteira após cada operação.
-    document.addEventListener('submit', async (event) => {
-        const form = event.target.closest('form[data-os-ajax]');
-        if (!form || event.defaultPrevented) return;
-        event.preventDefault();
-        const botao = form.querySelector('button[type="submit"]');
-        if (botao) botao.disabled = true;
-        try {
-            const resposta = await fetch(form.action, {
-                method: 'POST', body: new FormData(form), credentials: 'same-origin'
-            });
-            if (!resposta.ok) throw new Error('Falha ao atualizar a ordem de serviço.');
-            const documento = new DOMParser().parseFromString(await resposta.text(), 'text/html');
-            const proximo = documento.querySelector('#os-main');
-            if (!proximo) throw new Error('Não foi possível atualizar a tela.');
-            document.querySelector('#os-main').replaceWith(proximo);
-        } catch (erro) {
-            alert(erro.message);
-        } finally {
-            if (botao && botao.isConnected) botao.disabled = false;
-        }
-    });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body></html>

@@ -38,6 +38,10 @@ public class GlobalExceptionHandler {
 
     private String redirecionarComErro(HttpServletRequest request, String mensagem) {
         RequestContextUtils.getOutputFlashMap(request).put("erro", mensagem);
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isBlank()) {
+            return "redirect:" + referer;
+        }
         String caminho = request.getRequestURI().substring(request.getContextPath().length());
         String destino;
         if (caminho.startsWith("/clientes")) destino = "/clientes";

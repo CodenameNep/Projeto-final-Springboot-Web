@@ -7,12 +7,14 @@ import com.assistencia.service.UsuarioService;
 import jakarta.validation.Valid;
 import java.util.Locale;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -70,6 +72,19 @@ public class UsuarioController {
         }
 
         flash.addFlashAttribute("sucesso", "Usuario cadastrado com sucesso!");
+        return "redirect:/usuarios";
+    }
+
+    @PostMapping("/excluir/{id}")
+    public String excluir(@PathVariable("id") Long id, Authentication authentication, RedirectAttributes flash) {
+        try {
+            usuarioService.excluir(id, authentication != null ? authentication.getName() : null);
+            flash.addFlashAttribute("sucesso", "Usuário excluído com sucesso!");
+        } catch (IllegalArgumentException e) {
+            flash.addFlashAttribute("erro", e.getMessage());
+        } catch (Exception e) {
+            flash.addFlashAttribute("erro", "Não foi possível excluir o usuário (pode haver ordens ou registros vinculados a ele).");
+        }
         return "redirect:/usuarios";
     }
 }

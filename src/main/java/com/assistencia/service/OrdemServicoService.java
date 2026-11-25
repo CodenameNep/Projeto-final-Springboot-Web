@@ -7,6 +7,7 @@ import com.assistencia.model.Servico;
 import com.assistencia.model.ItemOrdemServico;
 import com.assistencia.model.OrdemServico;
 import com.assistencia.model.enums.StatusOrdemServico;
+import com.assistencia.repository.ItemOrdemServicoRepository;
 import com.assistencia.repository.OrdemServicoRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrdemServicoService {
 
     private final OrdemServicoRepository ordemServicoRepository;
+    private final ItemOrdemServicoRepository itemOrdemServicoRepository;
+
+    @Autowired
+    public OrdemServicoService(OrdemServicoRepository ordemServicoRepository,
+                               ItemOrdemServicoRepository itemOrdemServicoRepository) {
+        this.ordemServicoRepository = ordemServicoRepository;
+        this.itemOrdemServicoRepository = itemOrdemServicoRepository;
+    }
 
     public OrdemServicoService(OrdemServicoRepository ordemServicoRepository) {
-        this.ordemServicoRepository = ordemServicoRepository;
+        this(ordemServicoRepository, null);
     }
 
     @Transactional(readOnly = true)
@@ -103,6 +113,9 @@ public class OrdemServicoService {
         }
         ItemOrdemServico item = new ItemOrdemServico(
                 ordem, servico, quantidade, servico.getPrecoBase());
+        if (itemOrdemServicoRepository != null) {
+            item = itemOrdemServicoRepository.save(item);
+        }
         ordem.getItens().add(item);
         calcularValorTotal(ordem);
         return ordemServicoRepository.save(ordem);
@@ -115,6 +128,10 @@ public class OrdemServicoService {
         validarQuantidade(quantidade);
         ItemOrdemServico item = buscarItemDaOrdem(ordem, itemId);
         item.setQuantidade(quantidade);
+        calcularSubtotal(item);
+        if (itemOrdemServicoRepository != null) {
+            itemOrdemServicoRepository.save(item);
+        }
         calcularValorTotal(ordem);
         return ordemServicoRepository.save(ordem);
     }
@@ -125,6 +142,9 @@ public class OrdemServicoService {
         exigirEditavel(ordem);
         ItemOrdemServico item = buscarItemDaOrdem(ordem, itemId);
         ordem.getItens().remove(item); // orphanRemoval exclui o registro associado.
+        if (itemOrdemServicoRepository != null) {
+            itemOrdemServicoRepository.delete(item);
+        }
         calcularValorTotal(ordem);
         return ordemServicoRepository.save(ordem);
     }

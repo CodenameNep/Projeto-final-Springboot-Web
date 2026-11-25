@@ -40,6 +40,7 @@
                         <th>E-mail</th>
                         <th>Perfil</th>
                         <th>Situação</th>
+                        <th class="text-end pe-3">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,9 +52,19 @@
                             <span th:if="${usuario.ativo}" class="badge text-bg-success">Ativo</span>
                             <span th:unless="${usuario.ativo}" class="badge text-bg-secondary">Inativo</span>
                         </td>
+                        <td class="text-end pe-3">
+                            <form th:action="@{/usuarios/excluir/{id}(id=${usuario.id})}" method="post" class="d-inline"
+                                  onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        th:disabled="${#authentication != null and #authentication.name == usuario.email}"
+                                        th:title="${#authentication != null and #authentication.name == usuario.email ? 'Você não pode excluir o seu próprio usuário conectado' : 'Excluir usuário'}">
+                                    Excluir
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(usuarios)}">
-                        <td colspan="4" class="text-center text-muted py-4">Nenhum usuário cadastrado.</td>
+                        <td colspan="5" class="text-center text-muted py-4">Nenhum usuário cadastrado.</td>
                     </tr>
                 </tbody>
             </table>

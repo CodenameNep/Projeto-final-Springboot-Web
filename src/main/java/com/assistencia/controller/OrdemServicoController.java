@@ -48,10 +48,10 @@ public class OrdemServicoController {
 
     @GetMapping
     public String listar(
-            @RequestParam(required = false) StatusOrdemServico status,
-            @RequestParam(required = false) String clienteNome,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @RequestParam(name = "status", required = false) StatusOrdemServico status,
+            @RequestParam(name = "clienteNome", required = false) String clienteNome,
+            @RequestParam(name = "dataInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(name = "dataFim", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
             Model model) {
 
         List<OrdemServico> ordens = ordemServicoService.buscarComFiltros(status, clienteNome, dataInicio, dataFim);
@@ -101,7 +101,7 @@ public class OrdemServicoController {
     }
 
     @GetMapping("/{id}")
-    public String detalhes(@PathVariable Long id, Model model, RedirectAttributes flash) {
+    public String detalhes(@PathVariable("id") Long id, Model model, RedirectAttributes flash) {
         try {
             model.addAttribute("os", ordemServicoService.buscarPorId(id));
             model.addAttribute("servicos", servicoService.listarTodos());
@@ -113,7 +113,7 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/iniciar")
-    public String iniciar(@PathVariable Long id, RedirectAttributes flash) {
+    public String iniciar(@PathVariable("id") Long id, RedirectAttributes flash) {
         try {
             ordemServicoService.atualizarStatus(id,
                     StatusOrdemServico.EM_ANDAMENTO);
@@ -125,7 +125,7 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/finalizar")
-    public String finalizar(@PathVariable Long id, @RequestParam String laudoTecnico,
+    public String finalizar(@PathVariable("id") Long id, @RequestParam("laudoTecnico") String laudoTecnico,
                             RedirectAttributes flash) {
         try {
             ordemServicoService.finalizarOrdem(id, laudoTecnico);
@@ -137,8 +137,8 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/itens")
-    public String adicionarItem(@PathVariable Long id, @RequestParam Long servicoId,
-                                @RequestParam Integer quantidade, RedirectAttributes flash) {
+    public String adicionarItem(@PathVariable("id") Long id, @RequestParam("servicoId") Long servicoId,
+                                @RequestParam("quantidade") Integer quantidade, RedirectAttributes flash) {
         try {
             ordemServicoService.adicionarServico(id, servicoService.buscarPorId(servicoId), quantidade);
             flash.addFlashAttribute("sucesso", "Serviço adicionado e total recalculado.");
@@ -149,8 +149,8 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/itens/{itemId}/quantidade")
-    public String alterarQuantidade(@PathVariable Long id, @PathVariable Long itemId,
-                                    @RequestParam Integer quantidade, RedirectAttributes flash) {
+    public String alterarQuantidade(@PathVariable("id") Long id, @PathVariable("itemId") Long itemId,
+                                    @RequestParam("quantidade") Integer quantidade, RedirectAttributes flash) {
         try {
             ordemServicoService.alterarQuantidade(id, itemId, quantidade);
             flash.addFlashAttribute("sucesso", "Quantidade e total atualizados.");
@@ -161,7 +161,7 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/itens/{itemId}/remover")
-    public String removerItem(@PathVariable Long id, @PathVariable Long itemId,
+    public String removerItem(@PathVariable("id") Long id, @PathVariable("itemId") Long itemId,
                               RedirectAttributes flash) {
         try {
             ordemServicoService.removerServico(id, itemId);

@@ -95,7 +95,7 @@
                         <td>
                             <strong th:text="${equipamento.marca}">Dell</strong> <span th:text="${equipamento.modelo}">Inspiron 15</span>
                         </td>
-                        <td class="text-muted font-monospace small" th:text="${equipamento.numeroSerie != null && !eq.numeroSerie.isEmpty() ? eq.numeroSerie : 'N/A'}">SN12345678</td>
+                        <td class="text-muted font-monospace small" th:text="${equipamento.numeroSerie != null && !equipamento.numeroSerie.isEmpty() ? equipamento.numeroSerie : 'N/A'}">SN12345678</td>
                         <td>
                             <a th:href="@{/clientes/editar/{id}(id=${equipamento.cliente.id})}" class="text-decoration-none fw-semibold" th:text="${equipamento.cliente.nome}">Nome do Cliente</a>
                             <br><small class="text-muted" th:text="${equipamento.cliente.telefone}">(11) 99999-9999</small>

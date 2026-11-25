@@ -37,7 +37,7 @@ public class ServicoController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(@PathVariable("id") Long id, Model model) {
         Servico servico = servicoService.buscarPorId(id);
         ServicoDTO dto = new ServicoDTO();
         dto.setId(servico.getId());
@@ -75,7 +75,7 @@ public class ServicoController {
     }
 
     @PostMapping("/excluir/{id}")
-    public String excluir(@PathVariable Long id, RedirectAttributes flash) {
+    public String excluir(@PathVariable("id") Long id, RedirectAttributes flash) {
         try {
             servicoService.excluir(id);
             flash.addFlashAttribute("sucesso", "Serviço excluído com sucesso!");
