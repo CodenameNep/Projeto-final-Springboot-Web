@@ -41,8 +41,7 @@
         </div>
     </form>
 </main>
-<script>
-    const cliente = document.getElementById('clienteId');
+<script>    const cliente = document.getElementById('clienteId');
     const equipamento = document.getElementById('equipamentoId');
     function filtrarEquipamentos() {
         for (const opcao of equipamento.options) {
@@ -56,6 +55,7 @@
     }
     cliente.addEventListener('change', filtrarEquipamentos);
     filtrarEquipamentos();
+
 </script>
 </body>
 </html>

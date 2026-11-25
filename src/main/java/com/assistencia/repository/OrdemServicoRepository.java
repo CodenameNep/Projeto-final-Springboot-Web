@@ -23,7 +23,6 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
 
     List<OrdemServico> findByTecnicoResponsavelId(Long tecnicoId);
 
-    // Consulta JPQL customizada para busca avançada com múltiplos filtros opcionais combinados
     @Query("SELECT os FROM OrdemServico os " +
            "WHERE (:status IS NULL OR os.status = :status) " +
            "AND (:clienteNome IS NULL OR LOWER(os.cliente.nome) LIKE LOWER(CONCAT('%', :clienteNome, '%'))) " +
@@ -37,7 +36,6 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
             @Param("dataFim") LocalDateTime dataFim
     );
 
-    // Consulta JPQL para filtrar ordens por intervalo de datas de abertura
     @Query("SELECT os FROM OrdemServico os " +
            "WHERE os.dataAbertura BETWEEN :dataInicio AND :dataFim " +
            "ORDER BY os.dataAbertura DESC")
@@ -46,17 +44,14 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
             @Param("dataFim") LocalDateTime dataFim
     );
 
-    // Consulta JPQL para busca por nome do cliente (case-insensitive)
     @Query("SELECT os FROM OrdemServico os " +
            "WHERE LOWER(os.cliente.nome) LIKE LOWER(CONCAT('%', :nome, '%')) " +
            "ORDER BY os.dataAbertura DESC")
     List<OrdemServico> buscarPorNomeClientePersonalizado(@Param("nome") String nome);
 
-    // Commit 15: consultas de agregacao executadas pelo banco, nao por loops Java.
     @Query("SELECT COUNT(os) FROM OrdemServico os WHERE os.status = :status")
     long contarPorStatus(@Param("status") StatusOrdemServico status);
 
-    // Contabiliza apenas OS finalizadas DENTRO do mes, evitando somar OS em aberto.
     @Query("SELECT SUM(os.valorTotal) FROM OrdemServico os " +
            "WHERE os.status = :status " +
            "AND os.dataFinalizacao >= :inicio " +

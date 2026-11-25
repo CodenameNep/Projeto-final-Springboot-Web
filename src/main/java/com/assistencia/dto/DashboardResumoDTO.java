@@ -4,7 +4,6 @@ import com.assistencia.model.OrdemServico;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Indicadores agregados para a tela inicial, sem regras de banco no controller. */
 public class DashboardResumoDTO {
 
     private final long abertas;

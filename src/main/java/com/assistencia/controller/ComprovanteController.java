@@ -16,7 +16,6 @@ public class ComprovanteController {
         this.ordemServicoService = ordemServicoService;
     }
 
-    // Acesso autenticado pelo Spring Security, igual as demais paginas do sistema.
     @GetMapping("/ordens/{id}/imprimir")
     public String imprimir(@PathVariable("id") Long id, Model model) {
         model.addAttribute("os", ordemServicoService.buscarPorId(id));

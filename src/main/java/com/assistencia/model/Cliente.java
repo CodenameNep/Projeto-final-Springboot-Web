@@ -39,13 +39,10 @@ public class Cliente {
     @Column(length = 120)
     private String email;
 
-    // Cada cliente pode ter um endereco.
-    // CascadeType.ALL permite salvar o endereco junto com o cliente.
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id", unique = true)
     private Endereco endereco;
 
-    // Um cliente pode ter varios equipamentos.
     @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     private List<Equipamento> equipamentos = new ArrayList<>();

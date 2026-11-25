@@ -10,7 +10,6 @@
     <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
     <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
 
-    <!-- Filtros e Busca Avancada -->
     <div class="card border-0 shadow-sm p-3 mb-4">
         <form th:action="@{/ordens}" method="get" class="row g-2 align-items-end">
             <div class="col-md-3">

@@ -27,7 +27,6 @@
             <form th:action="@{/clientes}" th:object="${cliente}" method="post" id="formCliente">
                 <input type="hidden" th:field="*{id}">
 
-                <!-- Dados Pessoais -->
                 <h5 class="fw-bold border-bottom pb-2 mb-3 text-secondary">
                     <i class="bi bi-person me-2"></i>Dados Básicos
                 </h5>
@@ -49,7 +48,6 @@
                     </div>
                 </div>
 
-                <!-- Endereço com Busca de CEP -->
                 <h5 class="fw-bold border-bottom pb-2 mb-3 text-secondary">
                     <i class="bi bi-geo-alt me-2"></i>Endereço (Integração ViaCEP)
                 </h5>
@@ -113,8 +111,7 @@
     </div>
 </main>
 
-<script>
-    const cepInput = document.getElementById('cep');
+<script>    const cepInput = document.getElementById('cep');
     const btnBuscarCep = document.getElementById('btnBuscarCep');
     const msgCep = document.getElementById('msgCep');
     const iconBuscar = document.getElementById('iconBuscar');
@@ -128,7 +125,6 @@
             return;
         }
 
-        // Feedback visual de carregando
         iconBuscar.classList.add('d-none');
         spinnerCep.classList.remove('d-none');
         msgCep.className = 'form-text text-primary small';
@@ -167,7 +163,9 @@
             buscarCep();
         }
     });
+
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 </body>
 </html>

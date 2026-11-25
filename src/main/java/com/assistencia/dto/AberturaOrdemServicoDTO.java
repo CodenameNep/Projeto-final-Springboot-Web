@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-/** Dados recebidos da tela de abertura da OS. IDs sao validados novamente no service. */
 public class AberturaOrdemServicoDTO {
 
     @NotNull(message = "Selecione um cliente.")

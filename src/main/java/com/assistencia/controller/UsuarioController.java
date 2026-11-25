@@ -64,7 +64,7 @@ public class UsuarioController {
         usuario.setAtivo(true);
 
         try {
-            // UsuarioService ja utiliza BCrypt atraves do PasswordEncoder.
+
             usuarioService.salvar(usuario, passwordEncoder);
         } catch (IllegalArgumentException e) {
             erros.rejectValue("email", "email.duplicado", e.getMessage());

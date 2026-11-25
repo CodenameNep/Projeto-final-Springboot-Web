@@ -114,7 +114,6 @@ public class ClienteController {
         return "redirect:/clientes";
     }
 
-    // Endpoint REST para busca dinâmica de CEP via AJAX no frontend
     @GetMapping("/cep/{cep}")
     @ResponseBody
     public ResponseEntity<?> buscarEnderecoPorCep(@PathVariable("cep") String cep) {

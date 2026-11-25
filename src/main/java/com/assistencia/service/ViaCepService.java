@@ -16,7 +16,7 @@ public class ViaCepService {
     }
 
     public Endereco buscarEnderecoPorCep(String cep) {
-        // Aceita CEP com ou sem hifen: 01001-000 ou 01001000.
+
         if (cep == null || !cep.trim().matches("\\d{5}-?\\d{3}")) {
             throw new IllegalArgumentException("CEP invalido. Informe 8 digitos.");
         }
@@ -26,13 +26,12 @@ public class ViaCepService {
 
         ViaCepDTO resposta;
         try {
-            // Faz um HTTP GET e converte o JSON recebido em um ViaCepDTO.
+
             resposta = restTemplate.getForObject(url, ViaCepDTO.class, cepLimpo);
         } catch (RestClientException e) {
             throw new IllegalStateException("Nao foi possivel consultar o ViaCEP.", e);
         }
 
-        // O ViaCEP devolve { "erro": "true" } para CEP inexistente.
         if (resposta == null || Boolean.TRUE.equals(resposta.getErro()) || resposta.getCep() == null) {
             throw new IllegalArgumentException("CEP nao encontrado.");
         }

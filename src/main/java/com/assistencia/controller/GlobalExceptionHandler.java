@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-/** Evita tela de erro tecnica em operacoes de cadastro e consulta. */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -51,7 +50,6 @@ public class GlobalExceptionHandler {
         else if (caminho.startsWith("/ordens")) destino = "/ordens";
         else destino = "/";
 
-        // Se a propria listagem causou o erro, redireciona para o inicio (evita loop).
         if (caminho.equals(destino)) destino = "/";
         return "redirect:" + destino;
     }

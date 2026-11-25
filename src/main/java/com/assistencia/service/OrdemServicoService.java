@@ -47,10 +47,6 @@ public class OrdemServicoService {
         return ordemServicoRepository.findAll();
     }
 
-    /**
-     * Consulta avançada com filtros combinados (status, cliente e intervalo de datas).
-     * Utiliza as queries customizadas com JPQL no OrdemServicoRepository.
-     */
     @Transactional(readOnly = true)
     public List<OrdemServico> buscarComFiltros(StatusOrdemServico status, String clienteNome,
                                                LocalDate dataInicio, LocalDate dataFim) {
@@ -70,7 +66,6 @@ public class OrdemServicoService {
         return ordemServicoRepository.buscarComFiltros(status, nome, inicio, fim);
     }
 
-    /** Abre a ordem com os relacionamentos validados, técnico logado e protocolo único. */
     @Transactional
     public OrdemServico abrirOrdem(Cliente cliente, Equipamento equipamento,
                                   Usuario tecnicoLogado, String defeitoRelatado) {
@@ -101,7 +96,6 @@ public class OrdemServicoService {
         return ordemServicoRepository.save(ordem);
     }
 
-    /** Registra o preço do catálogo no momento da inclusão (histórico imutável de preço). */
     @Transactional
     public OrdemServico adicionarServico(Long ordemId, Servico servico, Integer quantidade) {
         OrdemServico ordem = buscarPorId(ordemId);
@@ -141,7 +135,7 @@ public class OrdemServicoService {
         OrdemServico ordem = buscarPorId(ordemId);
         exigirEditavel(ordem);
         ItemOrdemServico item = buscarItemDaOrdem(ordem, itemId);
-        ordem.getItens().remove(item); // orphanRemoval exclui o registro associado.
+        ordem.getItens().remove(item);
         if (itemOrdemServicoRepository != null) {
             itemOrdemServicoRepository.delete(item);
         }
@@ -169,7 +163,6 @@ public class OrdemServicoService {
         }
     }
 
-    // Calcula o valor do item usando o preco registrado na OS, nao o preco atual do catalogo.
     public BigDecimal calcularSubtotal(ItemOrdemServico item) {
         if (item == null) {
             throw new IllegalArgumentException("Informe o item da ordem de servico.");
@@ -189,7 +182,6 @@ public class OrdemServicoService {
         return subtotal;
     }
 
-    // Recalcula cada subtotal e atualiza o valor total em memoria.
     public BigDecimal calcularValorTotal(OrdemServico ordemServico) {
         if (ordemServico == null || ordemServico.getItens() == null) {
             throw new IllegalArgumentException("Informe a ordem de servico e seus itens.");
@@ -203,7 +195,6 @@ public class OrdemServicoService {
         return total;
     }
 
-    // Grava os subtotais e o valor total na mesma transacao.
     @Transactional
     public OrdemServico recalcularTotal(Long ordemServicoId) {
         OrdemServico ordemServico = buscarPorId(ordemServicoId);
@@ -215,7 +206,6 @@ public class OrdemServicoService {
         return ordemServicoRepository.save(ordemServico);
     }
 
-    /** Encerramento com laudo obrigatório e data/hora, tudo na mesma transação. */
     @Transactional
     public OrdemServico finalizarOrdem(Long ordemId, String laudoTecnico) {
         OrdemServico ordem = buscarPorId(ordemId);
@@ -233,13 +223,12 @@ public class OrdemServicoService {
         return ordemServicoRepository.save(ordem);
     }
 
-    // So permite avancos validos no fluxo da ordem de servico.
     @Transactional
     public OrdemServico atualizarStatus(Long ordemServicoId, StatusOrdemServico novoStatus) {
         if (novoStatus == null) {
             throw new IllegalArgumentException("Informe o novo status da ordem de servico.");
         }
-        // Ninguém pode encerrar a OS sem laudo e data, nem por outro controller.
+
         if (novoStatus == StatusOrdemServico.FINALIZADA) {
             throw new IllegalStateException("Para finalizar, use finalizarOrdem com laudo tecnico.");
         }
@@ -247,7 +236,7 @@ public class OrdemServicoService {
         OrdemServico ordemServico = buscarPorId(ordemServicoId);
         StatusOrdemServico statusAtual = ordemServico.getStatus();
         if (statusAtual == novoStatus) {
-            return ordemServico; // Repetir o mesmo status nao altera o banco.
+            return ordemServico;
         }
         if (!transicaoPermitida(statusAtual, novoStatus)) {
             throw new IllegalStateException(

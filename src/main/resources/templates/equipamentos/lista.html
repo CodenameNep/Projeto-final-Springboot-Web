@@ -69,7 +69,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
-    <!-- Filtro ativo de cliente (se houver) -->
     <div th:if="${clienteFiltro != null}" class="alert alert-info py-2 d-flex justify-content-between align-items-center">
         <span><i class="bi bi-funnel-fill me-1"></i>Exibindo apenas aparelhos de: <strong th:text="${clienteFiltro.nome}">Cliente</strong></span>
         <a th:href="@{/equipamentos}" class="btn btn-sm btn-outline-dark">Limpar filtro</a>
@@ -127,7 +126,8 @@
     </a>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 </body>
 </html>
 

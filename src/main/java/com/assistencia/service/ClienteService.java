@@ -43,7 +43,6 @@ public class ClienteService {
         cliente.setTelefone(dados.getTelefone());
         cliente.setEmail(dados.getEmail());
 
-        // Atualiza o endereco existente, sem criar outro registro desnecessario.
         if (dados.getEndereco() != null) {
             if (cliente.getEndereco() == null) {
                 cliente.setEndereco(dados.getEndereco());

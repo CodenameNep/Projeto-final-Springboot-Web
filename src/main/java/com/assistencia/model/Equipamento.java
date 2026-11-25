@@ -39,7 +39,6 @@ public class Equipamento {
     @Column(length = 100)
     private String numeroSerie;
 
-    // Varios equipamentos podem pertencer ao mesmo cliente.
     @NotNull(message = "Vincule o equipamento a um cliente.")
     @ManyToOne(optional = false)
     @JoinColumn(name = "cliente_id", nullable = false)
